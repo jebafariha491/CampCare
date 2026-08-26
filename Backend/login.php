@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'db_connect.php';
 
 $response = array();
@@ -17,6 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $user = $result->fetch_assoc();
 
         if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['role'] = $user['role'];
+
             $response['status'] = "success";
             $response['message'] = "Login successful";
             $response['user'] = array(
