@@ -31,8 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $result = $stmt->get_result();
 
         $sent_count = 0;
-        $message = "Reminder: A vaccination camp will be held at " . $camp['location'] . " on " . $camp['camp_date'] . ". Please bring your child.";
-
+        $message = "প্রিয় অভিভাবক,\nআগামী " . $camp['camp_date'] . " তারিখে " . $camp['location'] . "-এ ভ্যাকসিন ক্যাম্প অনুষ্ঠিত হবে। অনুগ্রহ করে আপনার শিশুকে নিয়ে আসবেন।";
         while ($row = $result->fetch_assoc()) {
             $chat_id = $row['chat_id'];
             $url = "https://api.telegram.org/bot" . TELEGRAM_BOT_TOKEN . "/sendMessage";
