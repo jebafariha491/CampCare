@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $sent_count = 0;
         $message = "প্রিয় অভিভাবক,\nআগামী " . $camp['camp_date'] . " তারিখে " . $camp['location'] . "-এ ভ্যাকসিন ক্যাম্প অনুষ্ঠিত হবে। অনুগ্রহ করে আপনার শিশুকে নিয়ে আসবেন।";
+
         while ($row = $result->fetch_assoc()) {
             $chat_id = $row['chat_id'];
             $url = "https://api.telegram.org/bot" . TELEGRAM_BOT_TOKEN . "/sendMessage";
@@ -41,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_exec($ch);
             curl_close($ch);
 
