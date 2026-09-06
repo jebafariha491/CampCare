@@ -29,19 +29,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     $check_stmt->close();
 
-    // Add children under this family_id (new or existing)
+    // Add children under this family_id (new or existing), skipping duplicates
     $child_names = $_POST['child_name'];
     $child_dobs = $_POST['child_dob'];
 
     $children_added = 0;
     for ($i = 0; $i < count($child_names); $i++) {
         if (!empty($child_names[$i]) && !empty($child_dobs[$i])) {
-            $sql_child = "INSERT INTO children (family_id, name, dob) VALUES (?, ?, ?)";
-            $stmt_child = $conn->prepare($sql_child);
-            $stmt_child->bind_param("iss", $family_id, $child_names[$i], $child_dobs[$i]);
-            $stmt_child->execute();
-            $children_added++;
-            $stmt_child->close();
+
+            // Check if this exact child (same name + dob) already exists under this family
+            $check_child_sql = "SELECT id FROM children WHERE family_id = ? AND name = ? AND dob = ?";
+            $check_child_stmt = $conn->prepare($check_child_sql);
+            $check_child_stmt->bind_param("iss", $family_id, $child_names[$i], $child_dobs[$i]);
+            $check_child_stmt->execute();
+            $check_child_result = $check_child_stmt->get_result();
+
+            if ($check_child_result->num_rows == 0) {
+                $sql_child = "INSERT INTO children (family_id, name, dob) VALUES (?, ?, ?)";
+                $stmt_child = $conn->prepare($sql_child);
+                $stmt_child->bind_param("iss", $family_id, $child_names[$i], $child_dobs[$i]);
+                $stmt_child->execute();
+                $children_added++;
+                $stmt_child->close();
+            }
+            $check_child_stmt->close();
         }
     }
 
