@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CampCare — Rural Health Access Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F3EA; --paper-2:#EFE8D8; --ink:#292520; --ink-soft:#63594C;
+    --pine:#2F4B39; --pine-deep:#1E332A; --pine-tint:#E1E9DF;
+    --ochre:#B9852E; --ochre-tint:#F4E4C6;
+    --brick:#A2402A; --brick-tint:#F3DCD2;
+    --line:#DCD3BF; --card:#FFFEFB; --radius:14px;
+    --shadow:0 1px 2px rgba(41,37,32,0.06), 0 8px 24px -12px rgba(41,37,32,0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.display{font-family:'Fraunces',serif;letter-spacing:-0.01em;color:var(--pine-deep);margin:0;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;} button{font-family:inherit;cursor:pointer;}
+  ::selection{background:var(--ochre-tint);}
+
+  #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--paper-2);padding:32px 20px;}
+  .login-card{display:grid;grid-template-columns:1fr 1fr;max-width:980px;width:100%;min-height:620px;border-radius:28px;overflow:hidden;
+    box-shadow:0 40px 90px -30px rgba(30,51,42,0.4), 0 6px 20px rgba(30,51,42,0.08);background:var(--card);}
+  .login-art{background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.06), transparent 40%),linear-gradient(160deg, var(--pine) 0%, var(--pine-deep) 100%);
+    color:#EFE8D8;padding:48px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;}
+  .login-art::after{content:"";position:absolute;right:-120px;bottom:-120px;width:360px;height:360px;border-radius:50%;border:1px solid rgba(239,232,216,0.18);}
+  .login-art::before{content:"";position:absolute;right:-40px;bottom:-40px;width:260px;height:260px;border-radius:50%;border:1px solid rgba(239,232,216,0.14);}
+  .dot-grid{position:absolute;top:32px;right:36px;width:104px;height:70px;
+    background-image:radial-gradient(circle, rgba(239,232,216,0.4) 1.4px, transparent 1.4px);background-size:13px 13px;}
+  .brand-mark{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-weight:600;font-size:20px;color:#F7F3EA;}
+  .brand-mark .dot{width:9px;height:9px;border-radius:50%;background:var(--ochre);}
+
+  .brand-logo-row{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+  .brand-logo-mark{flex-shrink:0;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.35));}
+  .login-heading{font-size:28px;line-height:1.25;color:#F7F3EA;margin:0;max-width:320px;}
+  .login-desc{font-size:13px;color:#B7C2B0;line-height:1.7;max-width:340px;}
+
+  .avatar-trust{display:flex;align-items:center;gap:14px;margin-top:26px;}
+  .avatar-trust .avatars{display:flex;}
+  .avatar-trust .av{width:32px;height:32px;border-radius:50%;border:2px solid var(--pine-deep);display:flex;align-items:center;justify-content:center;
+    font-size:11.5px;font-weight:700;color:var(--pine-deep);margin-left:-9px;background:var(--ochre);}
+  .avatar-trust .av:first-child{margin-left:0;}
+  .avatar-trust .av:nth-child(2){background:#F7F3EA;}
+  .avatar-trust .av:nth-child(3){background:var(--ochre-tint);}
+  .avatar-trust .trust-text{font-size:12.5px;color:#B7C2B0;line-height:1.4;max-width:190px;}
+
+  .login-footer-credit{font-size:11.5px;color:#8FA187;}
+  .login-form-side{display:flex;align-items:center;justify-content:center;padding:40px;}
+  .login-box{width:100%;max-width:360px;}
+  .login-box .eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ochre);font-weight:600;margin-bottom:10px;}
+  .login-box h2{font-size:26px;margin-bottom:6px;}
+  .login-box .sub{color:var(--ink-soft);font-size:14px;margin-bottom:28px;}
+  .role-toggle{display:flex;background:var(--paper-2);border-radius:10px;padding:4px;margin-bottom:22px;}
+  .role-toggle button{flex:1;border:none;background:transparent;padding:9px 0;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink-soft);transition:.15s;}
+  .role-toggle button:hover:not(.active){color:var(--pine-deep);}
+  .role-toggle button.active{background:var(--card);color:var(--pine-deep);box-shadow:var(--shadow);}
+  label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin:16px 0 6px;}
+  input[type=text],input[type=password],input[type=date],input[type=tel],input[type=search],select,textarea{
+    width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card);font-size:14px;color:var(--ink);font-family:'Inter',sans-serif;transition:border-color .15s ease;}
+  input:hover,select:hover,textarea:hover{border-color:#C9BC9C;}
+  .password-field{position:relative;}
+  .password-field input{padding-right:42px;}
+  .password-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;padding:6px;
+    color:var(--ink-soft);display:flex;align-items:center;justify-content:center;border-radius:6px;transition:color .15s ease;}
+  .password-toggle:hover{color:var(--pine);}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--pine);outline-offset:1px;}
+  .btn-primary{margin-top:26px;width:100%;padding:12px 0;border:none;border-radius:9px;background:var(--pine-deep);color:#F7F3EA;font-weight:600;font-size:14px;transition:.15s;}
+  .btn-primary:hover{background:var(--pine);}
+  .demo-note{margin-top:18px;font-size:12px;color:var(--ink-soft);line-height:1.6;background:var(--paper-2);padding:10px 12px;border-radius:9px;}
+  .demo-note b{color:var(--pine-deep);}
+
+  #app-shell{display:none;min-height:100vh;grid-template-columns:246px 1fr;}
+  #app-shell.active{display:grid;}
+  .sidebar{background:var(--pine-deep);color:#EFE8D8;padding:22px 16px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .sidebar .brand-mark{margin-bottom:26px;padding:0 4px;}
+  .side-section-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:#8FA187;margin:16px 0 6px 10px;}
+  .side-link{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:13px;font-weight:500;color:#D7DED1;margin-bottom:1px;text-decoration:none;background:none;border:none;width:100%;text-align:left;transition:background-color .16s ease, transform .16s ease, color .16s ease;}
+  .side-link .ic{width:15px;text-align:center;opacity:.85;font-family:'IBM Plex Mono',monospace;font-size:11px;flex-shrink:0;transition:color .16s ease;}
+  .side-link:hover{background:rgba(239,232,216,0.09);color:#F7F3EA;transform:translateX(3px);}
+  .side-link.active{background:rgba(239,232,216,0.12);color:#F7F3EA;}
+  .side-link.active .ic{color:var(--ochre);}
+  .side-link.active:hover{transform:none;}
+  .sidebar-footer{margin-top:auto;padding-top:14px;border-top:1px solid rgba(239,232,216,0.12);}
+  .worker-chip{display:flex;align-items:center;gap:10px;padding:8px 6px;}
+  .worker-avatar{width:32px;height:32px;border-radius:50%;background:var(--ochre);display:flex;align-items:center;justify-content:center;font-weight:700;color:#3A2A0E;font-size:13px;flex-shrink:0;}
+  .worker-chip .name{font-size:13px;font-weight:600;color:#F7F3EA;}
+  .worker-chip .zone{font-size:11px;color:#A9B7A2;}
+  .logout-btn{background:none;border:none;color:#A9B7A2;font-size:12px;margin-top:8px;padding:4px 6px;text-decoration:underline;transition:color .15s ease;}
+  .logout-btn:hover{color:#F7F3EA;}
+
+  .main{padding:28px 40px 60px;max-width:1120px;}
+  .back-btn{display:inline-flex;align-items:center;gap:6px;border:none;background:none;color:var(--ink-soft);
+    font-size:13px;font-weight:600;padding:6px 4px;margin-bottom:10px;border-radius:6px;transition:color .15s ease, transform .15s ease;}
+  .back-btn:hover{color:var(--pine-deep);transform:translateX(-2px);}
+
+  .topline{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:14px;}
+  .topline .eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ochre);font-weight:600;margin-bottom:6px;}
+  .topline h1{font-size:27px;}
+  .topline .desc{color:var(--ink-soft);font-size:13.5px;margin-top:6px;max-width:540px;}
+
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;}
+  .stat-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;}
+  .stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#C9BC9C;}
+  .stat-card .num{font-family:'Fraunces',serif;font-size:27px;color:var(--pine-deep);}
+  .stat-card .lbl{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
+  .stat-card.warn .num{color:var(--brick);} .stat-card.gold .num{color:var(--ochre);}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;margin-bottom:18px;transition:box-shadow .18s ease;}
+  .panel:hover{box-shadow:0 1px 2px rgba(41,37,32,0.05), 0 6px 18px -14px rgba(41,37,32,0.3);}
+  .panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .panel-head h3{font-size:16px;}
+  .panel-head .hint{font-size:12px;color:var(--ink-soft);}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);padding:8px 10px;border-bottom:1px solid var(--line);font-weight:600;}
+  td{padding:11px 10px;border-bottom:1px solid var(--paper-2);vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  tbody tr{transition:background-color .14s ease;}
+  tbody tr:hover{background:#FBF8F1;}
+  tr.clickable:hover{background:var(--paper-2);cursor:pointer;}
+  tr.clickable td:first-child{transition:color .14s ease;}
+  tr.clickable:hover td:first-child b{color:var(--pine);}
+
+  .stamp{display:inline-flex;align-items:center;gap:5px;padding:3px 9px 3px 7px;border-radius:20px;font-size:11px;font-weight:600;border:1.4px dashed currentColor;white-space:nowrap;}
+  .stamp.given{color:var(--pine);background:var(--pine-tint);}
+  .stamp.soon{color:var(--ochre);background:var(--ochre-tint);}
+  .stamp.overdue{color:var(--brick);background:var(--brick-tint);}
+
+  .btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--ink);transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background-color .12s ease;}
+  .btn:hover{border-color:var(--pine);box-shadow:0 3px 10px -4px rgba(41,37,32,0.25);transform:translateY(-1px);}
+  .btn:active{transform:translateY(0);box-shadow:none;}
+  .btn.dark{background:var(--pine-deep);color:#F7F3EA;border:none;}
+  .btn.dark:hover{background:var(--pine);box-shadow:0 4px 14px -4px rgba(30,51,42,0.45);}
+  .btn.ghost{background:transparent;}
+  .btn.ghost:hover{background:var(--paper-2);}
+  .btn.sm{padding:5px 10px;font-size:12px;}
+  .btn.brick{background:var(--brick);color:#fff;border:none;}
+  .btn.brick:hover{background:#8C3623;box-shadow:0 4px 14px -4px rgba(162,64,42,0.45);}
+  .btn[disabled]{opacity:.5;cursor:default;transform:none !important;box-shadow:none !important;}
+
+  .grid-2{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+  .empty-state{padding:28px;text-align:center;color:var(--ink-soft);font-size:13.5px;}
+
+  #toast{position:fixed;bottom:22px;right:22px;background:var(--pine-deep);color:#F7F3EA;padding:13px 18px;border-radius:10px;font-size:13.5px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;transform:translateY(140%);opacity:0;transition:transform .35s ease, opacity .35s ease;z-index:50;max-width:320px;}
+  #toast.show{transform:translateY(0);opacity:1;}
+  #toast .tick{color:var(--ochre);font-family:'IBM Plex Mono',monospace;}
+
+  .coverage-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .coverage-row .area-name{width:120px;font-size:13px;font-weight:600;flex-shrink:0;}
+  .coverage-bar-track{flex:1;height:9px;background:var(--paper-2);border-radius:6px;overflow:hidden;}
+  .coverage-bar-fill{height:100%;border-radius:6px;background:var(--pine);}
+  .coverage-row .pct{width:38px;text-align:right;font-size:12.5px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
+
+  .child-detail-card{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--paper-2);}
+  .child-detail-card .info div{margin-bottom:3px;font-size:13.5px;}
+  .child-detail-card .info .name{font-family:'Fraunces',serif;font-size:20px;color:var(--pine-deep);margin-bottom:6px;}
+  .vax-item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--paper-2);}
+  .vax-item:last-child{border-bottom:none;}
+  .vax-item .vname{font-size:13.5px;font-weight:600;}
+  .vax-item .vage{font-size:12px;color:var(--ink-soft);}
+
+  .search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .search-bar input[type=search]{flex:1;min-width:180px;}
+  .search-bar select{width:auto;min-width:140px;}
+
+  .family-card{border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;background:var(--card);transition:box-shadow .16s ease;}
+  .family-card:hover{box-shadow:0 1px 2px rgba(41,37,32,0.05), 0 6px 18px -14px rgba(41,37,32,0.3);}
+  .family-card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;padding-bottom:10px;border-bottom:1px solid var(--paper-2);gap:10px;}
+  .family-child-row{display:flex;justify-content:space-between;align-items:center;padding:8px 6px;border-radius:8px;transition:background-color .14s ease;cursor:pointer;}
+  .family-child-row:hover{background:var(--paper-2);}
+
+  .attend-row{display:flex;align-items:center;gap:12px;padding:10px 6px;border-bottom:1px solid var(--paper-2);border-radius:8px;transition:background-color .14s ease;}
+  .attend-row:hover{background:var(--paper-2);}
+  .attend-row:last-child{border-bottom:none;}
+  .attend-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--pine);}
+  .attend-row .who{flex:1;font-size:13.5px;}
+  .attend-row .who small{display:block;color:var(--ink-soft);font-size:11.5px;}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(30,51,42,0.45);display:none;align-items:center;justify-content:center;z-index:60;}
+  .modal-overlay.show{display:flex;}
+  .modal-box{background:var(--card);border-radius:var(--radius);padding:26px 28px;max-width:340px;width:90%;box-shadow:var(--shadow);text-align:center;}
+  .modal-box h3{font-size:18px;margin-bottom:8px;}
+  .modal-box p{font-size:13.5px;color:var(--ink-soft);margin-bottom:20px;}
+  .modal-actions{display:flex;gap:10px;}
+  .modal-actions .btn{flex:1;}
+
+  .breadcrumb-note{font-size:12px;color:var(--ink-soft);margin-bottom:4px;}
+
+  /* Help / How-to-use page — built entirely from existing tokens above, no new colors */
+  .help-card{margin-bottom:18px;}
+  .help-card-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .help-card-num{width:28px;height:28px;border-radius:50%;background:var(--pine-tint);color:var(--pine-deep);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:600;font-size:14px;flex-shrink:0;}
+  .help-shot{border:1.5px dashed var(--line);border-radius:var(--radius);background:var(--paper-2);padding:30px 18px;text-align:center;margin-bottom:14px;}
+  .help-shot .ic{font-size:22px;display:block;margin-bottom:6px;opacity:.6;}
+  .help-shot .cap{font-size:12px;color:var(--ink-soft);}
+  .help-shot .path{font-size:11px;color:var(--ink-soft);margin-top:4px;}
+  .help-steps{margin:0;padding-left:0;list-style:none;}
+  .help-steps li{display:flex;gap:10px;font-size:13.5px;padding:7px 0;border-bottom:1px solid var(--paper-2);}
+  .help-steps li:last-child{border-bottom:none;}
+  .help-steps li .step-dot{width:20px;height:20px;border-radius:50%;background:var(--ochre-tint);color:var(--ochre);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .help-group-label{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--ochre);font-weight:600;margin:24px 0 4px;}
+
+  ::placeholder{color:#A79E8E;}
+
+  @media (max-width:880px){
+    #app-shell{grid-template-columns:1fr;}
+    .sidebar{position:relative;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;}
+    .sidebar .brand-mark{margin-bottom:0;margin-right:auto;}
+    .side-section-label{display:none;}
+    .sidebar-footer{margin-top:0;border-top:none;padding-top:0;}
+    .stat-row{grid-template-columns:1fr 1fr;}
+    .grid-2{grid-template-columns:1fr;}
+    .login-card{grid-template-columns:1fr;}
+    .login-art{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="login-screen">
+ <div class="login-card">
+  <div class="login-art">
+    <div class="dot-grid"></div>
+
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+      <div class="brand-logo-row" style="margin-bottom:16px;">
+        <svg class="brand-logo-mark" width="230" height="86" viewBox="0 0 460 172" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <!-- earpieces -->
+          <rect x="60" y="6" width="18" height="28" rx="9" fill="#D9A94A" transform="rotate(-14 69 20)"/>
+          <rect x="126" y="6" width="18" height="28" rx="9" fill="#D9A94A" transform="rotate(14 135 20)"/>
+          <!-- tubes down to the Y join -->
+          <path d="M66 30 C 56 58, 58 90, 100 110" stroke="#D9A94A" stroke-width="8" stroke-linecap="round"/>
+          <path d="M138 30 C 148 58, 146 90, 104 110" stroke="#D9A94A" stroke-width="8" stroke-linecap="round"/>
+          <!-- chest tube looping down, then the long wave over to the chestpiece -->
+          <path d="M100 108 C 92 128, 88 152, 112 160 C 144 170, 152 138, 150 116 C 148 96, 168 88, 190 98 C 226 114, 258 132, 300 122 C 332 114, 344 96, 378 102"
+                stroke="#F7F3EA" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="398" cy="106" r="16" fill="none" stroke="#F7F3EA" stroke-width="8"/>
+          <!-- wordmark -->
+          <text x="156" y="66" font-family="'Fraunces',serif" font-weight="700" font-size="44" fill="#D9A94A">Camp</text>
+          <text x="172" y="151" font-family="'Fraunces',serif" font-weight="700" font-size="36" fill="#F7F3EA">Care</text>
+        </svg>
+      </div>
+      <div class="login-heading" style="margin-bottom:14px;">Welcome to CampCare</div>
+      <div class="login-desc">CampCare replaces the paper register with one dashboard for every health worker &mdash; registrations, due dates, camps, and reminders, all in one place.</div>
+
+      <div class="avatar-trust">
+        <div class="avatars">
+          <div class="av">J</div>
+          <div class="av">M</div>
+          <div class="av">N</div>
+        </div>
+        <div class="trust-text">Trusted by health workers across every zone</div>
+      </div>
+    </div>
+
+    <div class="login-footer-credit">Made with &#10084;&#65039; by Team Null Pointers</div>
+  </div>
+  <div class="login-form-side">
+    <div class="login-box">
+      <div id="login-panel">
+        <div class="eyebrow">Sign in</div>
+        <h2>Welcome back</h2>
+        <div class="sub">Log in to continue your fieldwork.</div>
+        <div class="role-toggle">
+          <button id="role-worker-btn" class="active" onclick="setLoginRole('worker')">Health Worker</button>
+          <button id="role-super-btn" onclick="setLoginRole('supervisor')">Supervisor</button>
+        </div>
+        <div>
+          <label>Phone number</label>
+          <input type="text" id="login-phone" placeholder="e.g. 01711-000001" onkeydown="if(event.key==='Enter'){event.preventDefault(); doLogin();}">
+          <label>Password</label>
+          <div class="password-field">
+            <input type="password" id="login-pass" placeholder="Enter your password" onkeydown="if(event.key==='Enter'){event.preventDefault(); doLogin();}">
+            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('login-pass', this)" aria-label="Show password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+          <div style="text-align:right;margin-top:8px;">
+            <a href="#" onclick="event.preventDefault(); showToast('Password reset isn\'t available in this prototype yet — contact your CampCare admin.');" style="font-size:12px;color:var(--pine);font-weight:600;text-decoration:underline;">Forgot password?</a>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="doLogin()">Log in</button>
+        <div id="login-error" style="display:none;color:var(--brick);font-size:12.5px;margin-top:10px;font-weight:600;"></div>
+        <div style="text-align:center;margin-top:16px;">
+          <a href="#" onclick="event.preventDefault(); showSignup();" style="font-size:12.5px;color:var(--pine-deep);font-weight:600;text-decoration:underline;">New here? Create an account</a>
+        </div>
+      </div>
+
+      <div id="signup-panel" style="display:none;">
+        <div class="eyebrow">Create account</div>
+        <h2>Join CampCare</h2>
+        <div class="sub">Set up a login for a new health worker or supervisor.</div>
+        <div class="role-toggle">
+          <button id="signup-role-worker-btn" class="active" onclick="setSignupRole('worker')">Health Worker</button>
+          <button id="signup-role-super-btn" onclick="setSignupRole('supervisor')">Supervisor</button>
+        </div>
+        <label>Full name</label>
+        <input type="text" id="signup-name" placeholder="e.g. Nusrat Jahan">
+        <label>Phone number</label>
+        <input type="text" id="signup-phone" placeholder="e.g. 01711-000004">
+        <div id="signup-zone-field">
+          <label>Assigned area / zone</label>
+          <select id="signup-zone"><option>Char Aicha</option><option>Boalmari</option><option>Sonargaon</option></select>
+        </div>
+        <label>Password</label>
+        <div class="password-field">
+          <input type="password" id="signup-pass" placeholder="Create a password">
+          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signup-pass', this)" aria-label="Show password">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+        <label>Confirm password</label>
+        <div class="password-field">
+          <input type="password" id="signup-pass2" placeholder="Re-enter password">
+          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signup-pass2', this)" aria-label="Show password">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+        <button class="btn-primary" onclick="submitSignup()">Create account</button>
+        <div id="signup-error" style="display:none;color:var(--brick);font-size:12.5px;margin-top:10px;font-weight:600;"></div>
+        <div style="text-align:center;margin-top:16px;">
+          <a href="#" onclick="event.preventDefault(); showLogin();" style="font-size:12.5px;color:var(--pine-deep);font-weight:600;text-decoration:underline;">Already have an account? Log in</a>
+        </div>
+        <div class="demo-note">This creates an in-memory demo account only — it lives for this browser session and resets on reload. A real deployment would create this via the backend API instead.</div>
+      </div>
+    </div>
+  </div>
+ </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="app-shell">
+  <div class="sidebar">
+    <div class="brand-mark"><span class="dot"></span> CampCare</div>
+
+    <div id="nav-worker" style="display:none;">
+      <div class="side-section-label">Home</div>
+      <button class="side-link" data-view="dashboard" onclick="go('dashboard')"><span class="ic">&#9679;</span> Dashboard</button>
+
+      <div class="side-section-label">Auth &amp; registration</div>
+      <button class="side-link" data-view="register" onclick="go('register')"><span class="ic">+</span> Register family &amp; child</button>
+      <button class="side-link" data-view="children" onclick="go('children')"><span class="ic">&#8801;</span> Family / child list</button>
+
+      <div class="side-section-label">Vaccination tracking</div>
+      <button class="side-link" data-view="due" onclick="go('due')"><span class="ic">!</span> Due / overdue list</button>
+      <button class="side-link" data-view="history" onclick="go('history')"><span class="ic">&#8635;</span> Vaccination history</button>
+
+      <div class="side-section-label">Camp workflow</div>
+      <button class="side-link" data-view="camp-schedule" onclick="go('camp-schedule')"><span class="ic">+</span> Schedule camp</button>
+      <button class="side-link" data-view="camps" onclick="go('camps')"><span class="ic">&#9650;</span> Camp list</button>
+      <button class="side-link" data-view="attendance" onclick="go('attendance')"><span class="ic">&#10003;</span> Camp attendance</button>
+
+      <div class="side-section-label">Telegram</div>
+      <button class="side-link" data-view="reminder" onclick="go('reminder')"><span class="ic">&#9993;</span> Send reminder</button>
+
+      <div class="side-section-label">Help</div>
+      <button class="side-link" data-view="help" onclick="go('help')"><span class="ic">?</span> Help / How to use</button>
+    </div>
+
+    <div id="nav-super" style="display:none;">
+      <div class="side-section-label">Supervisor</div>
+      <button class="side-link" data-view="supervisor" onclick="go('supervisor')"><span class="ic">&#9679;</span> Coverage-gap dashboard</button>
+      <button class="side-link" data-view="workers" onclick="go('workers')"><span class="ic">&#9642;</span> Multi-worker overview</button>
+      <button class="side-link" data-view="performance" onclick="go('performance')"><span class="ic">&#9776;</span> Performance report</button>
+
+      <div class="side-section-label">Help</div>
+      <button class="side-link" data-view="help" onclick="go('help')"><span class="ic">?</span> Help / How to use</button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="worker-chip">
+        <div class="worker-avatar" id="avatar-letter">J</div>
+        <div><div class="name" id="chip-name">Jeba Fariha</div><div class="zone" id="chip-zone">Zone: Char Aicha</div></div>
+      </div>
+      <button class="logout-btn" onclick="askLogout()">Log out</button>
+    </div>
+  </div>
+
+  <div class="main" id="main-content"></div>
+</div>
+
+<div id="toast"><span class="tick">&#9658;</span> <span id="toast-msg"></span></div>
+
+<div class="modal-overlay" id="logout-modal">
+  <div class="modal-box">
+    <h3>Log out of CampCare?</h3>
+    <p>You'll need to sign in again to access your zone's data.</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeLogoutModal()">Cancel</button>
+      <button class="btn brick" onclick="doLogout()">Log out</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CampCare prototype — in-memory demo data & simple hash-free router
+   All data lives only in JS memory for this demo; nothing is sent
+   anywhere or persisted. Reloading the page resets it.
+   ============================================================ */
+
+const vaccineSchedule = [
+  {name:"BCG", ageWeeks:0},
+  {name:"OPV-0", ageWeeks:0},
+  {name:"Penta-1 / PCV-1 / OPV-1", ageWeeks:6},
+  {name:"Penta-2 / PCV-2 / OPV-2", ageWeeks:10},
+  {name:"Penta-3 / PCV-3 / OPV-3 / IPV", ageWeeks:14},
+  {name:"MR-1 (Measles-Rubella)", ageWeeks:39},
+  {name:"MR-2", ageWeeks:65}
+];
+
+function daysAgo(d){ const t=new Date(); t.setDate(t.getDate()-d); return t; }
+function addDays(d){ const t=new Date(); t.setDate(t.getDate()+d); return t; }
+function fmtDate(d){ return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+function fmtDateTime(d){ return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}) + ", " + d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); }
+function ageInWeeks(dob){ return Math.floor((new Date()-dob)/(1000*60*60*24*7)); }
+
+let families = [
+  {id:1, guardian:"Rehana Begum", phone:"01711-220011", area:"Char Aicha"},
+  {id:2, guardian:"Sharmin Aktar", phone:"01834-552210", area:"Char Aicha"},
+  {id:3, guardian:"Momtaz Ali", phone:"01945-110023", area:"Char Aicha"},
+  {id:4, guardian:"Fatema Khatun", phone:"01611-880231", area:"Boalmari"},
+  {id:5, guardian:"Salma Begum", phone:"01522-990012", area:"Boalmari"},
+  {id:6, guardian:"Nazma Islam", phone:"01312-004455", area:"Char Aicha"},
+  {id:7, guardian:"Rina Aktar", phone:"01977-112233", area:"Char Aicha"},
+];
+
+let children = [
+  {id:1, familyId:1, name:"Mim Akter", dob:daysAgo(40), given:[{name:"BCG",date:daysAgo(38)},{name:"OPV-0",date:daysAgo(38)}]},
+  {id:2, familyId:2, name:"Rakib Hossain", dob:daysAgo(75), given:[{name:"BCG",date:daysAgo(74)},{name:"OPV-0",date:daysAgo(74)}]},
+  {id:3, familyId:3, name:"Nusrat Jahan", dob:daysAgo(120), given:[{name:"BCG",date:daysAgo(118)},{name:"OPV-0",date:daysAgo(118)},{name:"Penta-1 / PCV-1 / OPV-1",date:daysAgo(75)}]},
+  {id:4, familyId:4, name:"Arif Hasan", dob:daysAgo(280), given:[{name:"BCG",date:daysAgo(278)},{name:"OPV-0",date:daysAgo(278)},{name:"Penta-1 / PCV-1 / OPV-1",date:daysAgo(230)},{name:"Penta-2 / PCV-2 / OPV-2",date:daysAgo(200)}]},
+  {id:5, familyId:5, name:"Tania Sultana", dob:daysAgo(10), given:[]},
+  {id:6, familyId:6, name:"Sadia Rahman", dob:daysAgo(200), given:[{name:"BCG",date:daysAgo(198)},{name:"OPV-0",date:daysAgo(198)},{name:"Penta-1 / PCV-1 / OPV-1",date:daysAgo(150)}]},
+  {id:7, familyId:7, name:"Habibur Rahman", dob:daysAgo(500), given:[{name:"BCG",date:daysAgo(495)},{name:"OPV-0",date:daysAgo(495)},{name:"Penta-1 / PCV-1 / OPV-1",date:daysAgo(450)},{name:"Penta-2 / PCV-2 / OPV-2",date:daysAgo(420)}]},
+  {id:8, familyId:7, name:"Jannatul Ferdous", dob:daysAgo(150), given:[{name:"BCG",date:daysAgo(148)},{name:"OPV-0",date:daysAgo(148)}]},
+];
+
+function familyOf(child){ return families.find(fam=>fam.id===child.familyId); }
+function childrenOf(familyId){ return children.filter(c=>c.familyId===familyId); }
+function nextFamilyId(){ return families.length ? Math.max(...families.map(f=>f.id))+1 : 1; }
+function nextChildId(){ return children.length ? Math.max(...children.map(c=>c.id))+1 : 1; }
+
+let camps = [
+  {id:1, area:"Char Aicha", date:addDays(6), location:"Char Aicha Union Parishad Ground", notified:false, attendance:{}},
+  {id:2, area:"Boalmari", date:addDays(13), location:"Boalmari Primary School Field", notified:false, attendance:{}},
+];
+
+const workers = [
+  {name:"Jeba Fariha", zone:"Char Aicha", phone:"01711-000001", pass:"jeba123", registered:41, vaccinated:118, coverage:88},
+  {name:"Maliha Rahman Alif", zone:"Boalmari", phone:"01711-000002", pass:"maliha123", registered:33, vaccinated:96, coverage:74},
+  {name:"Nawsheen Tunajjina", zone:"Sonargaon", phone:"01711-000003", pass:"nawsheen123", registered:28, vaccinated:70, coverage:61},
+];
+const supervisors = [{name:"Sanjana Khan Seen", phone:"01711-000009", pass:"sanjana123"}];
+
+let historyLog = [
+  {child:"Nusrat Jahan", vaccine:"Penta-1 / PCV-1 / OPV-1", date:daysAgo(75)},
+  {child:"Sadia Rahman", vaccine:"Penta-1 / PCV-1 / OPV-1", date:daysAgo(150)},
+];
+
+function dueList(child){
+  const wks = ageInWeeks(child.dob);
+  const givenNames = child.given.map(g=>g.name);
+  return vaccineSchedule.map(v=>{
+    let status;
+    if(givenNames.includes(v.name)) status="given";
+    else if(wks >= v.ageWeeks + 2) status="overdue";
+    else if(wks >= v.ageWeeks - 2) status="soon";
+    else status="upcoming";
+    return {...v, status};
+  });
+}
+function overdueCount(child){ return dueList(child).filter(v=>v.status==="overdue").length; }
+function soonCount(child){ return dueList(child).filter(v=>v.status==="soon").length; }
+
+/* ---------------- Auth state ---------------- */
+let session = { role:"worker", loggedIn:false, worker: workers[0] };
+let editingId = null;
+let extraChildRows = 0;
+let regMode = "new";
+let presetFamilyId = null;
+
+function setLoginRole(role){
+  session.role = role;
+  document.getElementById('role-worker-btn').classList.toggle('active', role==='worker');
+  document.getElementById('role-super-btn').classList.toggle('active', role==='supervisor');
+}
+
+function normalizePhone(p){ const digits=(p||'').replace(/[^0-9]/g,''); return digits.slice(-10); }
+
+const EYE_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+const EYE_OFF_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.86 21.86 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.86 21.86 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+function togglePasswordVisibility(inputId, btn){
+  const input = document.getElementById(inputId);
+  if(input.type === 'password'){
+    input.type = 'text';
+    btn.innerHTML = EYE_OFF_SVG;
+    btn.setAttribute('aria-label', 'Hide password');
+  } else {
+    input.type = 'password';
+    btn.innerHTML = EYE_SVG;
+    btn.setAttribute('aria-label', 'Show password');
+  }
+}
+
+function doLogin(){
+  const phone = normalizePhone(document.getElementById('login-phone').value);
+  const pass = document.getElementById('login-pass').value.trim();
+  const errBox = document.getElementById('login-error');
+  let supMatch = null;
+
+  if(session.role==='worker'){
+    const match = workers.find(w=>normalizePhone(w.phone)===phone && w.pass.toLowerCase()===pass.toLowerCase());
+    if(!match){
+      errBox.textContent = "No health worker account matches that phone number and password. Check the demo list below — dashes/spaces don't matter, but the digits and password must match exactly.";
+      errBox.style.display = "block";
+      return;
+    }
+    session.worker = match;
+  } else {
+    supMatch = supervisors.find(s=>normalizePhone(s.phone)===phone && s.pass.toLowerCase()===pass.toLowerCase());
+    if(!supMatch){
+      errBox.textContent = "No supervisor account matches that phone number and password. Check the demo list below — dashes/spaces don't matter, but the digits and password must match exactly.";
+      errBox.style.display = "block";
+      return;
+    }
+    session.supervisorAcct = supMatch;
+  }
+  errBox.style.display = "none";
+  navStack = [];
+  currentView = null;
+
+  session.loggedIn = true;
+  document.getElementById('login-screen').style.display = "none";
+  document.getElementById('app-shell').classList.add('active');
+  document.getElementById('nav-worker').style.display = session.role==='worker' ? 'block':'none';
+  document.getElementById('nav-super').style.display = session.role==='supervisor' ? 'block':'none';
+  if(session.role==='worker'){
+    document.getElementById('chip-name').textContent = session.worker.name;
+    document.getElementById('chip-zone').textContent = "Zone: " + session.worker.zone;
+    document.getElementById('avatar-letter').textContent = session.worker.name[0];
+    go('dashboard');
+  } else {
+    document.getElementById('chip-name').textContent = session.supervisorAcct.name;
+    document.getElementById('chip-zone').textContent = "NGO Supervisor";
+    document.getElementById('avatar-letter').textContent = session.supervisorAcct.name[0];
+    go('supervisor');
+  }
+}
+
+/* ---------------- Sign up ---------------- */
+let signupRole = "worker";
+function showSignup(){
+  document.getElementById('login-panel').style.display = "none";
+  document.getElementById('signup-panel').style.display = "block";
+  document.getElementById('signup-error').style.display = "none";
+}
+function showLogin(){
+  document.getElementById('signup-panel').style.display = "none";
+  document.getElementById('login-panel').style.display = "block";
+  document.getElementById('login-error').style.display = "none";
+}
+function setSignupRole(role){
+  signupRole = role;
+  document.getElementById('signup-role-worker-btn').classList.toggle('active', role==='worker');
+  document.getElementById('signup-role-super-btn').classList.toggle('active', role==='supervisor');
+  document.getElementById('signup-zone-field').style.display = role==='worker' ? 'block' : 'none';
+}
+function submitSignup(){
+  const name = document.getElementById('signup-name').value.trim();
+  const phoneRaw = document.getElementById('signup-phone').value.trim();
+  const phone = normalizePhone(phoneRaw);
+  const zone = document.getElementById('signup-zone').value;
+  const pass = document.getElementById('signup-pass').value;
+  const pass2 = document.getElementById('signup-pass2').value;
+  const errBox = document.getElementById('signup-error');
+
+  if(!name || !phoneRaw || !pass){
+    errBox.textContent = "Please fill in your name, phone number, and password.";
+    errBox.style.display = "block"; return;
+  }
+  if(phone.length < 6){
+    errBox.textContent = "Please enter a valid phone number.";
+    errBox.style.display = "block"; return;
+  }
+  if(pass !== pass2){
+    errBox.textContent = "Passwords don't match.";
+    errBox.style.display = "block"; return;
+  }
+  const phoneTaken = workers.some(w=>normalizePhone(w.phone)===phone) || supervisors.some(s=>normalizePhone(s.phone)===phone);
+  if(phoneTaken){
+    errBox.textContent = "An account with this phone number already exists — try logging in instead.";
+    errBox.style.display = "block"; return;
+  }
+  errBox.style.display = "none";
+
+  if(signupRole==='worker'){
+    workers.push({name, zone, phone:phoneRaw, pass, registered:0, vaccinated:0, coverage:0});
+  } else {
+    supervisors.push({name, phone:phoneRaw, pass});
+  }
+
+  showLogin();
+  setLoginRole(signupRole);
+  document.getElementById('login-phone').value = phoneRaw;
+  document.getElementById('login-pass').value = pass;
+  showToast(`Account created for ${name} — you can log in now.`);
+}
+
+function askLogout(){ document.getElementById('logout-modal').classList.add('show'); }
+function closeLogoutModal(){ document.getElementById('logout-modal').classList.remove('show'); }
+function doLogout(){
+  closeLogoutModal();
+  document.getElementById('app-shell').classList.remove('active');
+  document.getElementById('login-screen').style.display = "flex";
+  document.getElementById('login-phone').value = "";
+  document.getElementById('login-pass').value = "";
+  document.getElementById('login-error').style.display = "none";
+  navStack = [];
+  currentView = null;
+  showLogin();
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+/* ---------------- Router ---------------- */
+let navStack = [];
+let currentView = null;
+let currentParam = undefined;
+
+function go(view, param, _fromBack){
+  if(!_fromBack && currentView !== null){
+    navStack.push({view: currentView, param: currentParam});
+  }
+  currentView = view;
+  currentParam = param;
+
+  document.querySelectorAll('.side-link').forEach(el=>el.classList.toggle('active', el.dataset.view===view));
+  const main = document.getElementById('main-content');
+  const views = {
+    dashboard: renderDashboard,
+    register: renderRegister,
+    children: renderChildren,
+    'child-detail': renderChildDetail,
+    'edit-child': renderEditChild,
+    due: renderDue,
+    history: renderHistory,
+    'camp-schedule': renderCampSchedule,
+    camps: renderCamps,
+    attendance: renderAttendance,
+    reminder: renderReminder,
+    supervisor: renderSupervisor,
+    workers: renderWorkers,
+    performance: renderPerformance,
+    help: renderHelp,
+  };
+  const backBtn = navStack.length > 0
+    ? `<button class="back-btn" onclick="goBack()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg> Back</button>`
+    : '';
+  if(views[view]) main.innerHTML = backBtn + views[view](param);
+  else main.innerHTML = backBtn + render404(view);
+  window.scrollTo(0,0);
+}
+function goBack(){
+  if(navStack.length === 0) return;
+  const prev = navStack.pop();
+  go(prev.view, prev.param, true);
+}
+
+/* ---------------- Dashboard ---------------- */
+function renderDashboard(){
+  const mine = children.filter(c=>familyOf(c).area===session.worker.zone);
+  const overdue = mine.reduce((s,c)=>s+overdueCount(c),0);
+  const soon = mine.reduce((s,c)=>s+soonCount(c),0);
+  const nextCamp = camps.filter(c=>c.area===session.worker.zone).sort((a,b)=>a.date-b.date)[0];
+  return `
+    <div class="topline">
+      <div>
+        <div class="eyebrow">Assigned area &middot; ${session.worker.zone}</div>
+        <h1>Good morning, ${session.worker.name.split(' ')[0]}</h1>
+        <div class="desc">Here's what your zone needs today &mdash; registrations, due vaccines, and the next camp.</div>
+      </div>
+      <button class="btn dark" onclick="go('register')">+ Register family &amp; child</button>
+    </div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="num">${mine.length}</div><div class="lbl">Children registered</div></div>
+      <div class="stat-card warn"><div class="num">${overdue}</div><div class="lbl">Overdue vaccines</div></div>
+      <div class="stat-card gold"><div class="num">${soon}</div><div class="lbl">Due this week</div></div>
+      <div class="stat-card"><div class="num">${nextCamp? fmtDate(nextCamp.date).split(' ').slice(0,2).join(' ') : '—'}</div><div class="lbl">Next camp</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-head"><h3>Due or overdue this week</h3><span class="hint">Tap a child to update their record</span></div>
+        ${renderDueTable(mine)}
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>Next camp</h3></div>
+        ${nextCamp ? `
+          <div style="font-size:13.5px;line-height:1.8;">
+            <div><b>${nextCamp.location}</b></div>
+            <div class="mono" style="color:var(--ink-soft);font-size:12.5px;">${fmtDate(nextCamp.date)}</div>
+          </div>
+          <button class="btn dark sm" style="margin-top:14px;" onclick="go('reminder')">Go to reminder page</button>
+        ` : `<div class="empty-state">No camp scheduled for your zone yet.</div>`}
+      </div>
+    </div>
+  `;
+}
+function renderDueTable(list){
+  const rows = list.map(c=>{
+    const od = overdueCount(c), sn = soonCount(c);
+    if(od===0 && sn===0) return null;
+    const fam = familyOf(c);
+    const badge = od>0 ? `<span class="stamp overdue">${od} overdue</span>` : `<span class="stamp soon">${sn} due soon</span>`;
+    return `<tr class="clickable" onclick="go('child-detail', ${c.id})">
+      <td><b>${c.name}</b><br><span style="color:var(--ink-soft);font-size:12px;">${fam.guardian}</span></td>
+      <td>${fam.area}</td><td>${badge}</td>
+    </tr>`;
+  }).filter(Boolean);
+  if(rows.length===0) return `<div class="empty-state">Nothing overdue &mdash; the zone is on track this week.</div>`;
+  return `<table><thead><tr><th>Child</th><th>Area</th><th>Status</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
+}
+
+/* ---------------- Register (combined family + child, +add another, or add to existing family) ---------------- */
+function renderRegister(){
+  extraChildRows = 0;
+  regMode = presetFamilyId ? "existing" : "new";
+  return `
+    <div class="topline">
+      <div>
+        <div class="eyebrow">Field visit</div>
+        <h1>Register family &amp; child</h1>
+        <div class="desc">Add a guardian and one or more children during a home visit, or add a new child to a family already on file &mdash; no need to re-enter the guardian's details. A vaccination schedule is generated automatically for each child from their date of birth.</div>
+      </div>
+    </div>
+    <div class="panel" style="max-width:680px;">
+      <div class="role-toggle" style="max-width:340px;">
+        <button id="reg-new-btn" class="${regMode==='new'?'active':''}" onclick="setRegMode('new')">New family</button>
+        <button id="reg-existing-btn" class="${regMode==='existing'?'active':''}" onclick="setRegMode('existing')">Existing family</button>
+      </div>
+      <div id="reg-family-fields">${renderFamilyFields()}</div>
+      <div id="children-rows">
+        <div class="child-row" style="margin-top:18px;padding-top:14px;border-top:1px solid var(--paper-2);">
+          <label>Child's name</label>
+          <input type="text" class="child-name" placeholder="e.g. Mim Akter">
+          <label>Date of birth</label>
+          <input type="date" class="child-dob">
+        </div>
+      </div>
+      <button class="btn sm ghost" style="margin-top:14px;" onclick="addChildRow()">+ Add another child</button>
+      <div><button class="btn dark" style="margin-top:20px;" onclick="submitRegister()">Save &amp; generate schedule</button></div>
+    </div>
+  `;
+}
+function renderFamilyFields(){
+  if(regMode==='new'){
+    return `<label>Guardian's name</label><input type="text" id="f-guardian" placeholder="e.g. Rehana Begum">
+      <div class="field-row">
+        <div><label>Phone number</label><input type="tel" id="f-phone" placeholder="017XX-XXXXXX"></div>
+        <div><label>Area / zone</label><select id="f-area"><option>Char Aicha</option><option>Boalmari</option><option>Sonargaon</option></select></div>
+      </div>`;
+  }
+  const opts = families.map(fam=>{
+    const n = childrenOf(fam.id).length;
+    const sel = fam.id===presetFamilyId ? 'selected' : '';
+    return `<option value="${fam.id}" ${sel}>${fam.guardian} — ${fam.area} (${n} ${n===1?'child':'children'} on file)</option>`;
+  }).join('');
+  presetFamilyId = null;
+  return `<label>Select existing family</label><select id="f-existing-family">${opts}</select>
+    <div class="demo-note" style="margin-top:10px;">Linking a new child to this family reuses the guardian's saved name, phone, and area — nothing gets typed twice.</div>`;
+}
+function setRegMode(mode){
+  regMode = mode;
+  document.getElementById('reg-new-btn').classList.toggle('active', mode==='new');
+  document.getElementById('reg-existing-btn').classList.toggle('active', mode==='existing');
+  document.getElementById('reg-family-fields').innerHTML = renderFamilyFields();
+}
+function addChildRow(){
+  extraChildRows++;
+  const wrap = document.getElementById('children-rows');
+  const div = document.createElement('div');
+  div.className = 'child-row';
+  div.style.marginTop = '14px'; div.style.paddingTop='14px'; div.style.borderTop='1px solid var(--paper-2)';
+  div.innerHTML = `<label>Child's name</label><input type="text" class="child-name" placeholder="Child ${extraChildRows+1} name">
+                    <label>Date of birth</label><input type="date" class="child-dob">`;
+  wrap.appendChild(div);
+}
+function submitRegister(){
+  const names = [...document.querySelectorAll('.child-name')].map(i=>i.value.trim());
+  const dobs = [...document.querySelectorAll('.child-dob')].map(i=>i.value);
+  if(!names[0] || !dobs[0]){ showToast("Please fill in at least one child's name and date of birth."); return; }
+
+  let familyId, msgSubject;
+  if(regMode==='new'){
+    const guardian = document.getElementById('f-guardian').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    const area = document.getElementById('f-area').value;
+    if(!guardian){ showToast("Please enter the guardian's name."); return; }
+    const fam = {id: nextFamilyId(), guardian, phone, area};
+    families.push(fam);
+    familyId = fam.id;
+    msgSubject = "a new family record";
+  } else {
+    familyId = parseInt(document.getElementById('f-existing-family').value);
+    if(!familyId){ showToast("Please select an existing family."); return; }
+    msgSubject = "the selected family — guardian details reused";
+  }
+
+  let count = 0;
+  names.forEach((n,i)=>{
+    if(n && dobs[i]){
+      children.push({id: nextChildId()+count, familyId, name:n, dob:new Date(dobs[i]), given:[]});
+      count++;
+    }
+  });
+  showToast(`${count} child${count>1?'ren':''} added to ${msgSubject} — vaccination schedule generated.`);
+  go('children');
+}
+
+/* ---------------- Family/Child list (grouped by family, search/filter) ---------------- */
+function goAddChildToFamily(familyId){ presetFamilyId = familyId; go('register'); }
+
+function childrenResultsHTML(filterText, filterArea){
+  filterText = (filterText||'').toLowerCase();
+  filterArea = filterArea || 'all';
+  let fams = families;
+  if(filterArea!=='all') fams = fams.filter(f=>f.area===filterArea);
+  if(filterText) fams = fams.filter(fam=>{
+    const kids = childrenOf(fam.id);
+    return fam.guardian.toLowerCase().includes(filterText) || kids.some(k=>k.name.toLowerCase().includes(filterText));
+  });
+  if(fams.length===0) return `<div class="empty-state">No matching families found.</div>`;
+
+  return fams.map(fam=>{
+    const kids = childrenOf(fam.id);
+    const kidRows = kids.map(k=>{
+      const od = overdueCount(k), sn = soonCount(k);
+      let cls='given', label='up to date';
+      if(od>0){cls='overdue'; label=`${od} overdue`;}
+      else if(sn>0){cls='soon'; label=`${sn} due soon`;}
+      return `<div class="family-child-row" onclick="go('child-detail', ${k.id})">
+        <div><b>${k.name}</b> <span style="color:var(--ink-soft);font-size:12px;">&middot; ${ageInWeeks(k.dob)} wks</span></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="stamp ${cls}">${label}</span>
+          <button class="btn sm" onclick="event.stopPropagation(); go('edit-child', ${k.id})">Edit</button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="family-card">
+      <div class="family-card-head">
+        <div>
+          <b>${fam.guardian}</b>
+          <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">${fam.area} &middot; <span class="mono">${fam.phone}</span> &middot; ${kids.length} ${kids.length===1?'child':'children'} on file</div>
+        </div>
+        <button class="btn sm" onclick="goAddChildToFamily(${fam.id})">+ Add child</button>
+      </div>
+      ${kidRows || `<div class="empty-state" style="padding:10px 0;">No children yet under this family.</div>`}
+    </div>`;
+  }).join('');
+}
+function renderChildren(){
+  return `
+    <div class="topline">
+      <div><div class="eyebrow">All zones</div><h1>Family / child list</h1><div class="desc">Grouped by family &mdash; each guardian appears once, with every child under them listed below.</div></div>
+      <button class="btn dark" onclick="go('register')">+ Register family &amp; child</button>
+    </div>
+    <div class="panel">
+      <div class="search-bar">
+        <input type="search" id="search-input" placeholder="Search by child or guardian name..." oninput="liveFilterChildren()" autocomplete="off">
+        <select id="area-filter" onchange="liveFilterChildren()">
+          <option value="all">All areas</option>
+          <option>Char Aicha</option>
+          <option>Boalmari</option>
+          <option>Sonargaon</option>
+        </select>
+      </div>
+      <div id="children-results">${childrenResultsHTML('', 'all')}</div>
+    </div>
+  `;
+}
+function liveFilterChildren(){
+  const text = document.getElementById('search-input').value;
+  const area = document.getElementById('area-filter').value;
+  document.getElementById('children-results').innerHTML = childrenResultsHTML(text, area);
+}
+
+/* ---------------- Child detail / vaccination record update ---------------- */
+function renderChildDetail(id){
+  const c = children.find(x=>x.id===id);
+  if(!c) return render404('child-detail');
+  const fam = familyOf(c);
+  const siblings = childrenOf(fam.id).filter(x=>x.id!==c.id);
+  const list = dueList(c);
+  const items = list.map(v=>{
+    let stampHtml;
+    if(v.status==='given') stampHtml = `<span class="stamp given">&#10003; given</span>`;
+    else if(v.status==='overdue') stampHtml = `<span class="stamp overdue">overdue</span>`;
+    else if(v.status==='soon') stampHtml = `<span class="stamp soon">due soon</span>`;
+    else stampHtml = `<span class="mono" style="font-size:11.5px;color:var(--ink-soft);">not yet due</span>`;
+    const action = v.status!=='given' ? `<button class="btn sm" onclick="markGiven(${c.id},'${v.name.replace(/'/g,"\\'")}')">Mark given</button>` : '';
+    return `<div class="vax-item">
+      <div><div class="vname">${v.name}</div><div class="vage">Due at ${v.ageWeeks===0?'birth':v.ageWeeks+' weeks'}</div></div>
+      <div style="display:flex;align-items:center;gap:10px;">${stampHtml} ${action}</div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="topline">
+      <div><div class="breadcrumb-note">Vaccination record update</div><h1>${c.name}</h1></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" onclick="go('edit-child', ${c.id})">Edit details</button>
+        <button class="btn ghost" onclick="go('children')">&larr; Back to list</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="child-detail-card">
+        <div class="info">
+          <div><b>Guardian:</b> ${fam.guardian}</div>
+          <div><b>Phone:</b> <span class="mono">${fam.phone}</span></div>
+          <div><b>Area:</b> ${fam.area}</div>
+          <div><b>Age:</b> ${ageInWeeks(c.dob)} weeks (DOB: ${fmtDate(c.dob)})</div>
+        </div>
+      </div>
+      ${siblings.length ? `<div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:16px;">Other children in this family: ${siblings.map(s=>`<a href="#" onclick="event.preventDefault(); go('child-detail', ${s.id})" style="color:var(--pine);text-decoration:underline;">${s.name}</a>`).join(', ')}</div>` : ''}
+      <h3 style="font-size:14px;margin-bottom:8px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;">Vaccination schedule</h3>
+      ${items}
+    </div>
+  `;
+}
+function markGiven(id, vname){
+  const c = children.find(x=>x.id===id);
+  if(c && !c.given.some(g=>g.name===vname)){
+    c.given.push({name:vname, date:new Date()});
+    historyLog.unshift({child:c.name, vaccine:vname, date:new Date()});
+  }
+  showToast(`Recorded: ${vname} marked as given.`);
+  go('child-detail', id);
+}
+
+/* ---------------- Edit family & child ---------------- */
+function renderEditChild(id){
+  const c = children.find(x=>x.id===id);
+  if(!c) return render404('edit-child');
+  const fam = familyOf(c);
+  editingId = id;
+  return `
+    <div class="topline">
+      <div><div class="eyebrow">Edit record</div><h1>Edit family &amp; child</h1></div>
+      <button class="btn ghost" onclick="go('child-detail', ${id})">&larr; Cancel</button>
+    </div>
+    <div class="panel" style="max-width:640px;">
+      <div class="demo-note" style="margin-bottom:16px;">Guardian details are shared across this family — changing them here updates every child linked to ${fam.guardian}.</div>
+      <label>Guardian's name</label>
+      <input type="text" id="e-guardian" value="${fam.guardian}">
+      <div class="field-row">
+        <div><label>Phone number</label><input type="tel" id="e-phone" value="${fam.phone}"></div>
+        <div><label>Area / zone</label>
+          <select id="e-area">
+            <option ${fam.area==='Char Aicha'?'selected':''}>Char Aicha</option>
+            <option ${fam.area==='Boalmari'?'selected':''}>Boalmari</option>
+            <option ${fam.area==='Sonargaon'?'selected':''}>Sonargaon</option>
+          </select>
+        </div>
+      </div>
+      <label>Child's name</label>
+      <input type="text" id="e-child" value="${c.name}">
+      <label>Date of birth</label>
+      <input type="date" id="e-dob" value="${c.dob.toISOString().slice(0,10)}">
+      <button class="btn dark" style="margin-top:20px;" onclick="submitEdit()">Save changes</button>
+    </div>
+  `;
+}
+function submitEdit(){
+  const c = children.find(x=>x.id===editingId);
+  if(!c) return;
+  const fam = familyOf(c);
+  fam.guardian = document.getElementById('e-guardian').value.trim();
+  fam.phone = document.getElementById('e-phone').value.trim();
+  fam.area = document.getElementById('e-area').value;
+  c.name = document.getElementById('e-child').value.trim();
+  c.dob = new Date(document.getElementById('e-dob').value);
+  showToast("Family & child record updated.");
+  go('child-detail', c.id);
+}
+
+/* ---------------- Due/overdue list (color-coded, all children) ---------------- */
+function renderDue(){
+  const mine = children.filter(c=>familyOf(c).area===session.worker.zone);
+  const rows = mine.map(c=>{
+    const od = overdueCount(c), sn = soonCount(c);
+    let status = 'On track', cls='given';
+    if(od>0){status=`${od} overdue`; cls='overdue';}
+    else if(sn>0){status=`${sn} due soon`; cls='soon';}
+    return `<tr class="clickable" onclick="go('child-detail', ${c.id})">
+      <td><b>${c.name}</b></td><td>${familyOf(c).guardian}</td>
+      <td><span class="stamp ${cls}">${status}</span></td>
+    </tr>`;
+  }).join('');
+  return `
+    <div class="topline">
+      <div><div class="eyebrow">${session.worker.zone}</div><h1>Due / overdue list</h1><div class="desc">Color-coded status for every child in your zone &mdash; green is on track, gold is due soon, red is overdue.</div></div>
+    </div>
+    <div class="panel">
+      <table><thead><tr><th>Child</th><th>Guardian</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>
+    </div>
+  `;
+}
+
+/* ---------------- Vaccination history ---------------- */
+function renderHistory(){
+  const rows = historyLog.map(h=>`<tr><td>${h.child}</td><td>${h.vaccine}</td><td class="mono">${fmtDateTime(h.date)}</td></tr>`).join('');
+  return `
+    <div class="topline">
+      <div><div class="eyebrow">Activity log</div><h1>Vaccination history</h1><div class="desc">A running log of every dose recorded by you.</div></div>
+    </div>
+    <div class="panel">
+      ${rows ? `<table><thead><tr><th>Child</th><th>Vaccine</th><th>Recorded at</th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="empty-state">No vaccinations recorded yet. Mark a dose as given from a child's record to see it here.</div>`}
+    </div>
+  `;
+}
+
+/* ---------------- Camp scheduling ---------------- */
+function renderCampSchedule(){
+  return `
+    <div class="topline">
+      <div><div class="eyebrow">${session.worker.zone}</div><h1>Schedule a camp</h1><div class="desc">Plan an outreach vaccination camp for your zone.</div></div>
+    </div>
+    <div class="panel" style="max-width:520px;">
+      <label>Location</label><input type="text" id="c-loc" placeholder="e.g. Union Parishad Ground">
+      <label>Date</label><input type="date" id="c-date">
+      <button class="btn dark" style="margin-top:20px;" onclick="submitCamp()">Add camp</button>
+    </div>
+  `;
+}
+function submitCamp(){
+  const loc = document.getElementById('c-loc').value.trim();
+  const dateVal = document.getElementById('c-date').value;
+  if(!loc || !dateVal){ showToast("Please enter both a location and a date."); return; }
+  camps.push({id:camps.length+1, area:session.worker.zone, date:new Date(dateVal), location:loc, notified:false, attendance:{}});
+  showToast("Camp scheduled successfully.");
+  go('camps');
+}
+
+/* ---------------- Camp list ---------------- */
+function renderCamps(){
+  const mine = camps.filter(c=>c.area===session.worker.zone);
+  const rows = mine.map(c=>`
+    <div class="panel" style="margin-bottom:14px;">
+      <div class="panel-head"><h3>${c.location}</h3><span class="mono hint">${fmtDate(c.date)}</span></div>
+      <div style="font-size:13.5px;color:var(--ink-soft);margin-bottom:14px;">Zone: ${c.area} &middot; ${c.notified? 'Reminder sent to registered families.' : 'Reminder not sent yet.'}</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn sm" onclick="go('attendance', ${c.id})">Take attendance</button>
+        <button class="btn sm ${c.notified?'':'dark'}" onclick="go('reminder')" ${c.notified?'disabled':''}>${c.notified?'✓ Reminder sent':'Send reminder'}</button>
+      </div>
+    </div>
+  `).join('');
+  return `
+    <div class="topline">
+      <div><div class="eyebrow">${session.worker.zone}</div><h1>Camp list</h1><div class="desc">All scheduled vaccination camps in your zone.</div></div>
+      <button class="btn dark" onclick="go('camp-schedule')">+ Schedule camp</button>
+    </div>
+    ${rows || `<div class="empty-state">No camps scheduled yet for your zone.</div>`}
+  `;
+}
+
+/* ---------------- Camp attendance (checklist, per child) ---------------- */
+function renderAttendance(campId){
+  const mine = camps.filter(c=>c.area===session.worker.zone);
+  const c = campId ? camps.find(x=>x.id===campId) : mine[0];
+  if(!c) return `<div class="topline"><div><h1>Camp attendance</h1></div></div><div class="empty-state">No camps scheduled for your zone yet.</div>`;
+  const kidsHere = children.filter(k=>familyOf(k).area===c.area);
+  const rows = kidsHere.map(k=>{
+    const fam = familyOf(k);
+    return `<div class="attend-row">
+      <input type="checkbox" ${c.attendance[k.id]?'checked':''} onchange="toggleAttendance(${c.id},${k.id})">
+      <div class="who">${k.name} <small>${fam.guardian} &middot; ${fam.phone}</small></div>
+    </div>`;
+  }).join('');
+  const attendedCount = Object.values(c.attendance).filter(Boolean).length;
+  return `
+    <div class="topline">
+      <div><div class="eyebrow">${c.location}</div><h1>Camp attendance</h1><div class="desc">${fmtDate(c.date)} &middot; mark who showed up.</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Attendance checklist</h3><span class="hint">${attendedCount} / ${kidsHere.length} attended</span></div>
+      ${rows || `<div class="empty-state">No registered children in this zone yet.</div>`}
+    </div>
+  `;
+}
+function toggleAttendance(campId, childId){
+  const c = camps.find(x=>x.id===campId);
+  c.attendance[childId] = !c.attendance[childId];
+  go('attendance', campId);
+}
+
+/* ---------------- Telegram reminder trigger ---------------- */
+function renderReminder(){
+  const mine = camps.filter(c=>c.area===session.worker.zone);
+  const options = mine.map(c=>`<option value="${c.id}">${c.location} — ${fmtDate(c.date)}</option>`).join('');
+  return `
+    <div class="topline">
+      <div><div class="eyebrow">Telegram integration</div><h1>Send camp reminder</h1><div class="desc">Select a camp and broadcast a reminder to every registered family in that zone via Telegram.</div></div>
+    </div>
+    <div class="panel" style="max-width:520px;">
+      <label>Select camp</label>
+      <select id="r-camp">${options || '<option disabled>No camps scheduled</option>'}</select>
+      <button class="btn dark" style="margin-top:20px;" onclick="submitReminder()" ${mine.length===0?'disabled':''}>Send Telegram reminder</button>
+    </div>
+  `;
+}
+function submitReminder(){
+  const campId = parseInt(document.getElementById('r-camp').value);
+  const c = camps.find(x=>x.id===campId);
+  if(!c) return;
+  const affected = families.filter(f=>f.area===c.area).length;
+  c.notified = true;
+  showToast(`Telegram reminder sent to ${affected} registered families in ${c.area}.`);
+  go('reminder');
+}
+
+/* ---------------- Supervisor: coverage-gap dashboard ---------------- */
+function renderSupervisor(){
+  const totalReg = workers.reduce((s,w)=>s+w.registered,0);
+  const avgCov = Math.round(workers.reduce((s,w)=>s+w.coverage,0)/workers.length);
+  const lowest = [...workers].sort((a,b)=>a.coverage-b.coverage)[0];
+  return `
+    <div class="topline">
+      <div><div class="eyebrow">All zones</div><h1>Coverage-gap dashboard</h1><div class="desc">Vaccination coverage across all health workers — spot which zones need more outreach.</div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="num">${workers.length}</div><div class="lbl">Active health workers</div></div>
+      <div class="stat-card"><div class="num">${totalReg}</div><div class="lbl">Children registered</div></div>
+      <div class="stat-card gold"><div class="num">${avgCov}%</div><div class="lbl">Average coverage</div></div>
+      <div class="stat-card warn"><div class="num">${lowest.zone}</div><div class="lbl">Needs attention</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Coverage gap by zone</h3><span class="hint">Share of registered children fully up to date</span></div>
+      ${workers.map(w=>`
+        <div class="coverage-row">
+          <div class="area-name">${w.zone}</div>
+          <div class="coverage-bar-track"><div class="coverage-bar-fill" style="width:${w.coverage}%; background:${w.coverage<70?'var(--brick)':w.coverage<85?'var(--ochre)':'var(--pine)'}"></div></div>
+          <div class="pct">${w.coverage}%</div>
+        </div>`).join('')}
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Recent camps</h3></div>
+      <table><thead><tr><th>Zone</th><th>Location</th><th>Date</th><th>Status</th></tr></thead><tbody>
+        ${camps.map(c=>`<tr><td>${c.area}</td><td>${c.location}</td><td class="mono">${fmtDate(c.date)}</td><td>${c.notified? '<span class="stamp given">notified</span>':'<span class="stamp soon">pending</span>'}</td></tr>`).join('')}
+      </tbody></table>
+    </div>
+  `;
+}
+
+/* ---------------- Supervisor: multi-worker overview ---------------- */
+function renderWorkers(){
+  const rows = workers.map(w=>`
+    <tr><td><b>${w.name}</b></td><td>${w.zone}</td><td>${w.registered}</td><td>${w.vaccinated}</td>
+    <td><span class="stamp ${w.coverage<70?'overdue':w.coverage<85?'soon':'given'}">${w.coverage}%</span></td></tr>
+  `).join('');
+  return `
+    <div class="topline">
+      <div><div class="eyebrow">Team</div><h1>Multi-worker overview</h1><div class="desc">Registration and vaccination activity across every health worker.</div></div>
+    </div>
+    <div class="panel">
+      <table><thead><tr><th>Name</th><th>Zone</th><th>Registered</th><th>Vaccinations given</th><th>Coverage</th></tr></thead><tbody>${rows}</tbody></table>
+    </div>
+  `;
+}
+
+/* ---------------- Supervisor: performance report ---------------- */
+function renderPerformance(){
+  const cards = workers.map(w=>`
+    <div class="panel">
+      <div class="panel-head"><h3>${w.name}</h3><span class="hint">${w.zone}</span></div>
+      <div class="stat-row" style="margin-bottom:0;">
+        <div class="stat-card"><div class="num">${w.registered}</div><div class="lbl">Families registered</div></div>
+        <div class="stat-card"><div class="num">${w.vaccinated}</div><div class="lbl">Doses administered</div></div>
+        <div class="stat-card ${w.coverage<70?'warn':w.coverage<85?'gold':''}"><div class="num">${w.coverage}%</div><div class="lbl">Coverage rate</div></div>
+        <div class="stat-card"><div class="num">${camps.filter(c=>c.area===w.zone).length}</div><div class="lbl">Camps run</div></div>
+      </div>
+    </div>
+  `).join('');
+  return `
+    <div class="topline">
+      <div><div class="eyebrow">Per-worker detail</div><h1>Performance report</h1><div class="desc">A closer look at each health worker's field activity.</div></div>
+    </div>
+    ${cards}
+  `;
+}
+
+/* ---------------- 404 ---------------- */
+/* ---------------- Help / How to use ---------------- */
+function helpCard(num, title, shotLabel, shotFile, description, steps){
+  const stepsHtml = steps.map((s,i)=>`<li><span class="step-dot">${i+1}</span><span>${s}</span></li>`).join('');
+  return `
+    <div class="panel help-card">
+      <div class="help-card-head">
+        <div class="help-card-num">${num}</div>
+        <h3 style="font-size:16px;">${title}</h3>
+      </div>
+      <div class="help-shot">
+        <span class="ic">&#128247;</span>
+        <div class="cap">Screenshot: ${shotLabel}</div>
+        <div class="path mono">Frontend/images/help/${shotFile}</div>
+      </div>
+      <p style="font-size:13.5px;color:var(--ink-soft);margin:0 0 12px;">${description}</p>
+      <ul class="help-steps">${stepsHtml}</ul>
+    </div>
+  `;
+}
+function renderHelp(){
+  return `
+    <div class="topline">
+      <div><div class="eyebrow">Support</div><h1>Help / How to use CampCare</h1><div class="desc">A quick, step-by-step guide to every part of CampCare &mdash; for health workers and supervisors.</div></div>
+    </div>
+
+    <div class="help-group-label">For health workers</div>
+    ${helpCard(1, "Registering a Family &amp; Child", "Register family & child page", "register-family.png",
+      "Add a guardian and one or more children during a home visit. If the family already has a child on file, use \"Existing family\" instead so you don't have to re-type the guardian's details.",
+      ["Click <b>'Register family &amp; child'</b> in the sidebar.",
+       "For a new family, enter the guardian's name, phone number, and area. If the family is already registered, switch to <b>'Existing family'</b> and select them from the list.",
+       "Enter the child's name and date of birth. Click <b>'+ Add another child'</b> to register more than one child at once.",
+       "Click <b>'Save &amp; generate schedule'</b> and the vaccination schedule is created automatically."])}
+
+    ${helpCard(2, "Checking Who's Due for a Vaccine", "Due / overdue list page", "due-overdue-list.png",
+      "See every child in your zone with a color-coded status &mdash; at a glance you'll know who needs a visit this week.",
+      ["Click <b>'Due / overdue list'</b> in the sidebar.",
+       "<span class=\"stamp given\" style=\"vertical-align:middle;\">Green</span> means the child is up to date.",
+       "<span class=\"stamp soon\" style=\"vertical-align:middle;\">Gold</span> means a vaccine is due soon.",
+       "<span class=\"stamp overdue\" style=\"vertical-align:middle;\">Red</span> means overdue &mdash; visit this family as soon as possible.",
+       "Click on a child's name to open their full vaccination record."])}
+
+    ${helpCard(3, "Scheduling a Camp", "Schedule camp page", "schedule-camp.png",
+      "Plan an outreach vaccination camp for your zone so families know where and when to come.",
+      ["Click <b>'Schedule camp'</b> in the sidebar.",
+       "Enter the location and date (e.g. a union parishad ground or school field).",
+       "Click <b>'Add camp'</b> and it will appear in <b>'Camp list'</b>.",
+       "On the day of the camp, go to <b>'Camp attendance'</b> to check families in."])}
+
+    ${helpCard(4, "Sending Reminders", "Send reminder page", "send-reminder.png",
+      "Broadcast a Telegram reminder to every registered family in a zone ahead of a camp date.",
+      ["Click <b>'Send reminder'</b> in the sidebar.",
+       "From the dropdown, select the camp you want to send a reminder for.",
+       "Click <b>'Send Telegram reminder'</b> to message every registered family at once."])}
+
+    <div class="help-group-label">For supervisors</div>
+    ${helpCard(5, "Supervisor Dashboard", "Coverage-gap dashboard page", "supervisor-dashboard.png",
+      "Get a bird's-eye view of vaccination coverage across every health worker's zone, and spot which areas need more outreach.",
+      ["Log in as a supervisor and the <b>'Coverage-gap dashboard'</b> opens automatically.",
+       "Coverage bars are shown per zone &mdash; red or gold bars mean that zone needs more attention.",
+       "Open <b>'Multi-worker overview'</b> to see each health worker's registration and vaccination counts.",
+       "Open <b>'Performance report'</b> for a closer look at each worker's families, doses given, coverage rate, and camps run."])}
+  `;
+}
+
+
+/* ---------------- 404 ---------------- */
+function render404(view){
+  return `
+    <div class="panel empty-state">
+      That page doesn't exist or hasn't been built yet.<br><br>
+      <button class="btn dark" onclick="go(session.role==='worker'?'dashboard':'supervisor')">Back to home</button>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
