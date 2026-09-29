@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CampCare — Rural Health Access Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="login-screen">
+ <div class="login-card">
+  <div class="login-art">
+    <div class="dot-grid"></div>
+
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+      <div class="brand-logo-row" style="margin-bottom:16px;">
+        <svg class="brand-logo-mark" width="230" height="86" viewBox="0 0 460 172" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <!-- earpieces -->
+          <rect x="60" y="6" width="18" height="28" rx="9" fill="#D9A94A" transform="rotate(-14 69 20)"/>
+          <rect x="126" y="6" width="18" height="28" rx="9" fill="#D9A94A" transform="rotate(14 135 20)"/>
+          <!-- tubes down to the Y join -->
+          <path d="M66 30 C 56 58, 58 90, 100 110" stroke="#D9A94A" stroke-width="8" stroke-linecap="round"/>
+          <path d="M138 30 C 148 58, 146 90, 104 110" stroke="#D9A94A" stroke-width="8" stroke-linecap="round"/>
+          <!-- chest tube looping down, then the long wave over to the chestpiece -->
+          <path d="M100 108 C 92 128, 88 152, 112 160 C 144 170, 152 138, 150 116 C 148 96, 168 88, 190 98 C 226 114, 258 132, 300 122 C 332 114, 344 96, 378 102"
+                stroke="#F7F3EA" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="398" cy="106" r="16" fill="none" stroke="#F7F3EA" stroke-width="8"/>
+          <!-- wordmark -->
+          <text x="156" y="66" font-family="'Fraunces',serif" font-weight="700" font-size="44" fill="#D9A94A">Camp</text>
+          <text x="172" y="151" font-family="'Fraunces',serif" font-weight="700" font-size="36" fill="#F7F3EA">Care</text>
+        </svg>
+      </div>
+      <div class="login-heading" style="margin-bottom:14px;">Welcome to CampCare</div>
+      <div class="login-desc">CampCare:A Rural Health Access Platform replaces the paper register with one dashboard for every health worker &mdash; registrations, due dates, camps, and reminders, all in one place.</div>
+
+      <div class="avatar-trust">
+        <div class="avatars">
+          <div class="av">J</div>
+          <div class="av">M</div>
+          <div class="av">N</div>
+          <div class="av">S</div>
+        </div>
+        <div class="trust-text">Trusted by health workers across every zone</div>
+      </div>
+    </div>
+
+    <div class="login-footer-credit">Made with &#10084;&#65039; by Team Null Pointers</div>
+  </div>
+  <div class="login-form-side">
+    <div class="login-box">
+      <div id="login-panel">
+        <div class="eyebrow">Sign in</div>
+        <h2>Welcome back</h2>
+        <div class="sub">Log in to continue your fieldwork.</div>
+        <div class="role-toggle">
+          <button id="role-worker-btn" class="active" onclick="setLoginRole('worker')">Health Worker</button>
+          <button id="role-super-btn" onclick="setLoginRole('supervisor')">Supervisor</button>
+        </div>
+        <div>
+          <label>Phone number</label>
+          <input type="text" id="login-phone" placeholder="e.g. 01711-000001" onkeydown="if(event.key==='Enter'){event.preventDefault(); doLogin();}">
+          <label>Password</label>
+          <div class="password-field">
+            <input type="password" id="login-pass" placeholder="Enter your password" onkeydown="if(event.key==='Enter'){event.preventDefault(); doLogin();}">
+            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('login-pass', this)" aria-label="Show password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+          <div style="text-align:right;margin-top:8px;">
+            <a href="#" onclick="event.preventDefault(); showToast('Password reset isn\'t available in this prototype yet — contact your CampCare admin.');" style="font-size:12px;color:var(--pine);font-weight:600;text-decoration:underline;">Forgot password?</a>
+          </div>
+        </div>
+        <button class="btn-primary" id="login-submit-btn" onclick="doLogin()">Log in</button>
+        <div id="login-error" style="display:none;color:var(--brick);font-size:12.5px;margin-top:10px;font-weight:600;"></div>
+        <div style="text-align:center;margin-top:16px;">
+          <a href="#" onclick="event.preventDefault(); showSignup();" style="font-size:12.5px;color:var(--pine-deep);font-weight:600;text-decoration:underline;">Create an account</a>
+        </div>
+      </div>
+
+      <div id="signup-panel" style="display:none;">
+        <div class="eyebrow">Create account</div>
+        <h2>Join CampCare</h2>
+        <div class="sub">Set up a login for a new health worker or supervisor.</div>
+        <div class="role-toggle">
+          <button id="signup-role-worker-btn" class="active" onclick="setSignupRole('worker')">Health Worker</button>
+          <button id="signup-role-super-btn" onclick="setSignupRole('supervisor')">Supervisor</button>
+        </div>
+        <label>Full name</label>
+        <input type="text" id="signup-name" placeholder="e.g. Nusrat Jahan">
+        <label>Phone number</label>
+        <input type="text" id="signup-phone" placeholder="e.g. 01711-000004">
+        <div id="signup-zone-field">
+          <label>Assigned area / zone</label>
+          <select id="signup-zone">
+    <option>Char Aicha</option>
+    <option>Boalmari</option>
+    <option>Sonargaon</option>
+    <option>Bhanga</option>
+    <option>Shantipur</option>
+    <option>Saltha</option>
+     <option>Sandeep</option>
+</select>
+        </div>
+        <label>Password</label>
+        <div class="password-field">
+          <input type="password" id="signup-pass" placeholder="Create a password">
+          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signup-pass', this)" aria-label="Show password">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+        <label>Confirm password</label>
+        <div class="password-field">
+          <input type="password" id="signup-pass2" placeholder="Re-enter password">
+          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signup-pass2', this)" aria-label="Show password">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+        <button class="btn-primary" onclick="submitSignup()">Create account</button>
+        <div id="signup-error" style="display:none;color:var(--brick);font-size:12.5px;margin-top:10px;font-weight:600;"></div>
+        <div style="text-align:center;margin-top:16px;">
+          <a href="#" onclick="event.preventDefault(); showLogin();" style="font-size:12.5px;color:var(--pine-deep);font-weight:600;text-decoration:underline;">Already have an account? Log in</a>
+        </div>
+        <div class="demo-note">This creates an in-memory demo account only — it lives for this browser session and resets on reload. A real deployment would create this via the backend API instead.</div>
+      </div>
+    </div>
+  </div>
+ </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="app-shell">
+  <div class="sidebar">
+    <div class="brand-mark"><span class="dot"></span> CampCare</div>
+
+    <div id="nav-worker" style="display:none;">
+      <div class="side-section-label">Home</div>
+      <button class="side-link" data-view="dashboard" onclick="go('dashboard')"><span class="ic">&#9679;</span> Dashboard</button>
+
+      <div class="side-section-label">Auth &amp; registration</div>
+      <button class="side-link" data-view="register" onclick="go('register')"><span class="ic">+</span> Register family &amp; child</button>
+      <button class="side-link" data-view="children" onclick="go('children')"><span class="ic">&#8801;</span> Family / child list</button>
+
+      <div class="side-section-label">Vaccination tracking</div>
+      <button class="side-link" data-view="due" onclick="go('due')"><span class="ic">!</span> Due / overdue list</button>
+      <button class="side-link" data-view="history" onclick="go('history')"><span class="ic">&#8635;</span> Vaccination history</button>
+
+      <div class="side-section-label">Camp workflow</div>
+      <button class="side-link" data-view="camp-schedule" onclick="go('camp-schedule')"><span class="ic">+</span> Schedule camp</button>
+      <button class="side-link" data-view="camps" onclick="go('camps')"><span class="ic">&#9650;</span> Camp list</button>
+      <button class="side-link" data-view="attendance" onclick="go('attendance')"><span class="ic">&#10003;</span> Camp attendance</button>
+
+      <div class="side-section-label">Telegram</div>
+      <button class="side-link" data-view="reminder" onclick="go('reminder')"><span class="ic">&#9993;</span> Send reminder</button>
+
+      <div class="side-section-label">SMS</div>
+<button class="side-link" data-view="sms-reminder" onclick="go('sms-reminder')">
+  <span class="ic">&#9993;</span> Send SMS
+</button>
+
+     
+      <div class="side-section-label">Help</div>
+      <button class="side-link" data-view="help" onclick="go('help')"><span class="ic">?</span> Help / How to use</button>
+    </div>
+
+    <div id="nav-super" style="display:none;">
+      <div class="side-section-label">Supervisor</div>
+      <button class="side-link" data-view="supervisor" onclick="go('supervisor')"><span class="ic">&#9679;</span> Coverage-gap dashboard</button>
+      <button class="side-link" data-view="workers" onclick="go('workers')"><span class="ic">&#9642;</span> Multi-worker overview</button>
+      <button class="side-link" data-view="performance" onclick="go('performance')"><span class="ic">&#9776;</span> Performance report</button>
+
+      <div class="side-section-label">Help</div>
+      <button class="side-link" data-view="help" onclick="go('help')"><span class="ic">?</span> Help / How to use</button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="worker-chip">
+        <div class="worker-avatar" id="avatar-letter">J</div>
+        <div><div class="name" id="chip-name">Jeba Fariha</div><div class="zone" id="chip-zone">Zone: Char Aicha</div></div>
+      </div>
+      <button class="logout-btn" onclick="askLogout()">Log out</button>
+    </div>
+  </div>
+
+  <div class="main" id="main-content"></div>
+</div>
+
+<div id="toast"><span class="tick">&#9658;</span> <span id="toast-msg"></span></div>
+
+<div class="modal-overlay" id="logout-modal">
+  <div class="modal-box">
+    <h3>Log out of CampCare?</h3>
+    <p>You'll need to sign in again to access your zone's data.</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeLogoutModal()">Cancel</button>
+      <button class="btn brick" onclick="doLogout()">Log out</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/helpers.js"></script>
+<script src="js/shared-ui.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/login.js"></script>
+<script src="js/signup.js"></script>
+<script src="js/logout.js"></script>
+<script src="js/router.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/register.js"></script>
+<script src="js/children.js"></script>
+<script src="js/child-detail.js"></script>
+<script src="js/due.js"></script>
+<script src="js/history.js"></script>
+<script src="js/camps.js"></script>
+<script src="js/attendance.js"></script>
+<script src="js/reminder.js"></script>
+<script src="js/supervisor.js"></script>
+<script src="js/workers.js"></script>
+<script src="js/performance.js"></script>
+<script src="js/help.js"></script>
+</body>
+</html>
